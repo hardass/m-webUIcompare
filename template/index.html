@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>XML Compare</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 12px;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+        .topbg{
+            height: 5px;
+            background: #e1e1e1;
+        }
+
+        .container {
+            height: auto;
+            line-height: 25px;
+            margin: 10px 0 0;
+            padding: 0 10px 0;
+        }
+
+        .select {
+            width: 200px;
+            height: 25px;
+        }
+
+        .button {
+            border: solid 1px #000;
+            width: 100px;
+            height: 25px;
+        }
+        .result{
+            display: none;
+            margin: 10px 0 0;
+            padding: 0 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+<h1>XML Comparison between Staging and Production environment (version 0.2)</h1>
+<p>
+<br><br>
+1. Only client DB XMLConfiguration tables are compared, DNN 'client info' setting is NOT involved;
+<br>
+2. This is only on TEST purpose, author is NOT responsible for executed results and service availability;
+<br>
+3. If this program violates any audit, compliance, or legal policy, please contact author to terminate this program;
+<br>
+4. Any suggestion or error reporting is appreciated;
+<br><br>
+Hardas Yang
+<br><br>
+</p>
+<form id="aaa" action="/compare/" method="POST">
+    <div class="topbg"></div>
+    <div class="container">
+        <p>
+            <span>Client Name:</span>
+            <span>
+                <select name="selClientName" class="select">
+                    <option value="0">--Please Select--</option>
+                    <!-- <option value="1">Hardas</option> -->
+                        {{range .ClientNames}}
+                            <option value="{{.}}">{{.}}</option>
+                        {{end}}
+                </select>
+            </span>
+            <span><input id="btnCompare" type="button" value="Compare" class="button" /></span>
+        </p>
+    </div>
+    <div class="result">
+        Please hold on for a few seconds...
+    </div>
+    <script type="text/javascript">
+        var myEl = document.getElementById('btnCompare');
+        var myResult = document.getElementsByClassName('result');
+        myEl.addEventListener('click', function () {
+            document.getElementById('aaa').submit();
+            myResult[0].style.display = 'block';
+        }, false);
+    </script>
+</form>
+</body>
+</html>

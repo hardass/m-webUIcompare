@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style type="text/css">
+        * {
+            font-size: 12px;
+            font-family: Tahoma;
+        }
+
+        table {
+            border: 1px solid #a9ea00;
+            border-collapse: collapse;
+            empty-cells: show;
+        }
+
+        td {
+            border: 1px solid #000;
+            padding: 5px;
+            height: 25px;
+            width: 140px;
+            overflow: hidden;
+        }
+
+            td div {
+                width: 440px;
+                height: 25px;
+            }
+
+                td div div {
+                    width: 440px;
+                    height: 25px;
+                }
+    </style>
+
+</head>
+<body>
+    <h1>Client Name: {{.ClientName}}</h1>
+    <table>
+        <tr>
+            <td align="center">XML Name</td>
+            <td align="center">Staging</td>
+            <td align="center">Production</td>
+        </tr>
+        {{range .XMLs}}
+        <tr>
+            <td>{{.XMLName}}</td>
+            <td><div><div>{{.XMLStaging}}</div></div></td>
+            <td><div><div>{{.XMLProduction}}</div></div></td>
+        </tr>
+        {{end}}
+    </table>
+<br><br><br><br><br>
+    <table>
+        <tr>
+            <td align="center">Rule ID</td>
+            <td align="center">Rule Type</td>
+            <td align="center">Staging</td>
+            <td align="center">Production</td>
+        </tr>
+        {{range .Rules}}
+        <tr>
+            <td>{{.RuleID}}</td>
+            <td>{{.RuleType}}</td>
+            <td><div><div>{{.RuleStaging}}</div></div></td>
+            <td><div><div>{{.RuleProduction}}</div></div></td>
+        </tr>
+        {{end}}
+    </table>
+    <p>triple click on XML cell to select all content in FireFox, then copy to your favorite editor to check</p>
+    <p><a href="javascript:history.go(-1);">Back to Previous</a></p>
+</body>
+</html>
