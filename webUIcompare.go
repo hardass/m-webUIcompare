@@ -13,7 +13,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -31,6 +30,8 @@ var (
 	production_port     int
 	production_user     string
 	production_password string
+
+	host_post string
 )
 
 type IndexData struct {
@@ -88,7 +89,7 @@ func (sorter SorterRule) Swap(i, j int) {
 	sorter[i], sorter[j] = sorter[j], sorter[i]
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request, title string) {
+func indexHandler(w http.ResponseWriter, r *http.Request) {
 	datebases := retrievedblist()
 	database := IndexData{
 		ClientNames: datebases}
@@ -99,7 +100,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request, title string) {
 	}
 }
 
-func compareHandler(w http.ResponseWriter, r *http.Request, title string) {
+func compareHandler(w http.ResponseWriter, r *http.Request) {
 	clientname := r.FormValue("selClientName")
 	// fmt.Println(clientname)
 
@@ -121,9 +122,9 @@ var templates *template.Template
 // add index
 // var validPath = regexp.MustCompile("^/(edit|save|view|index)/([a-zA-Z0-9]+)$")
 
-var validPath = regexp.MustCompile("^/(index|compare)/")
+var validPath = regexp.MustCompile("^/(index|compare|new)/")
 
-func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+func makeHandler(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
 		if m == nil {
@@ -132,7 +133,7 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 		}
 		// fmt.Println(m)
 		// fn(w, r, m[2])
-		fn(w, r, m[1])
+		fn(w, r)
 	}
 }
 
@@ -324,8 +325,8 @@ func comparerule(clientname string) []RuleResult {
 	return resultlist
 }
 
-func ReadConfiguration(path string) {
-	configfile, err := ioutil.ReadFile(filepath.Join(path, "./config.json"))
+func ReadConfiguration() {
+	configfile, err := ioutil.ReadFile("config.json")
 	if err != nil {
 		fmt.Println("configuration file cannot be accessed")
 		panic(err)
@@ -345,24 +346,23 @@ func ReadConfiguration(path string) {
 	production_port, err = js.Get("production_port").Int()
 	production_user, err = js.Get("production_user").String()
 	production_password, err = js.Get("production_password").String()
+
+	host_post, err = js.Get("host_port").String()
 }
 
 func main() {
-	binpath, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
-	}
-	templatepath := filepath.Join(binpath, "./template/")
-	templates = template.Must(template.ParseFiles(filepath.Join(templatepath, "./index.html"), filepath.Join(templatepath, "./result.html")))
+	templates = template.Must(template.ParseFiles(filepath.Join("template", "index.html"), filepath.Join("template", "result.html")))
 
 	//get sql servers' configuration
-	ReadConfiguration(binpath)
+	ReadConfiguration()
+
+	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
 
 	//add index handler
 	http.HandleFunc("/index/", makeHandler(indexHandler))
 	http.HandleFunc("/compare/", makeHandler(compareHandler))
 
-	// fmt.Println("start")
+	fmt.Println("start...")
 
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(host_post, nil)
 }
