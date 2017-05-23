@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style type="text/css">
+        * {
+            font-size: 12px;
+            font-family: Tahoma;
+        }
+
+        table {
+            border: 1px solid #a9ea00;
+            border-collapse: collapse;
+            empty-cells: show;
+        }
+
+        td {
+            border: 1px solid #000;
+            padding: 5px;
+            height: 25px;
+            width: 100px;
+            overflow: hidden;
+        }
+
+            td div {
+                width: 340px;
+                height: 25px;
+            }
+
+                td div div {
+                    width: 440px;
+                    height: 25px;
+                }
+        #result
+        {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 0 auto;
+        }
+        #close
+        {
+            color: White;
+            font-size: 40px;
+            width: 150px;
+            height: 50px;
+            font-weight: bold;
+            line-height: 50px;
+            background: Red;
+            cursor: pointer;
+            padding: 0 0 0 10px;
+        }
+    </style>
+        <link href="/resources/css/index.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="/resources/css/webtool_only.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="/resources/css/reports.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="/resources/css/global.css" media="all" rel="stylesheet" type="text/css" />
+    <!-- Javascripts -->
+    <script src="/resources/api/jquery-3.1.1.min.js" type="application/javascript"></script>
+    <script src="/resources/lib/global.js" type="application/javascript"></script>
+    <script src="/resources/lib/language.js" type="application/javascript"></script>
+    <script src="/resources/lib/options.js" type="application/javascript"></script>
+    <script src="/resources/lib/finalFile.js" type="application/javascript"></script>
+    <script src="/resources/lib/safeSort.js" type="application/javascript"></script>
+    <script src="/resources/ace/ace.js" type="application/javascript"></script>
+    <script src="/resources/api/dom.js" type="application/javascript"></script>
+    <script src="/resources/lib/csspretty.js" type="application/javascript"></script>
+    <script src="/resources/lib/csvpretty.js" type="application/javascript"></script>
+    <script src="/resources/lib/diffview.js" type="application/javascript"></script>
+    <script src="/resources/lib/jspretty.js" type="application/javascript"></script>
+    <script src="/resources/lib/markuppretty.js" type="application/javascript"></script>
+    <script src="/resources/prettydiff.js" type="application/javascript"></script>
+<script type="text/javascript">
+    function Compare(sourceObj,destObj)
+    {
+        var container=$("#result");
+        var sourceXml=$('#'+sourceObj).text();
+        var destXml=$('#'+destObj).text();
+        var
+        args = {
+            source: sourceXml,
+            diff: destXml,
+            lang: "xml",
+            sourcelabel: "Staging XML",
+            difflabel: "Production XML"
+        },
+        output = global.prettydiff.prettydiff(args);
+    var pretty = output[0];
+    var report = output[1];
+    console.log(output);
+    // $("#prettydiff").append(output);
+    document.getElementById("prettydiff").innerHTML="";
+    document.getElementById("prettydiff").innerHTML=output;
+    container.show();
+    
+    }
+    function CloseDiv()
+    {
+        $("#result").hide();
+    }
+
+</script>
+</head>
+<body>
+    <h1>Client Name: {{.ClientName}}</h1>
+    <table>
+        <tr>
+            <td align="center">XML Name</td>
+            <td align="center">Staging</td>
+            <td align="center">Production</td>
+            <td align="center">Operation</td>
+        </tr>
+        {{range .XMLs}}
+        <tr>
+            <td>{{.XMLName}}</td>
+            <td><div id="stg_{{.XMLName}}">{{.XMLStaging}}</div></td>
+            <td><div id="pro_{{.XMLName}}">{{.XMLProduction}}</div></td>
+            <td><input type="button" value="Try this" onclick="Compare('stg_{{.XMLName}}','pro_{{.XMLName}}');"></td>
+        </tr>
+        {{end}}
+    </table>
+<br><br><br><br><br>
+    <table>
+        <tr>
+            <td align="center">Rule ID</td>
+            <td align="center">Rule Type</td>
+            <td align="center">Staging</td>
+            <td align="center">Production</td>
+        </tr>
+        {{range .Rules}}
+        <tr>
+            <td>{{.RuleID}}</td>
+            <td>{{.RuleType}}</td>
+            <td><div><div>{{.RuleStaging}}</div></div></td>
+            <td><div><div>{{.RuleProduction}}</div></div></td>
+        </tr>
+        {{end}}
+    </table>
+    <p>triple click on XML cell to select all content in FireFox, then copy to your favorite editor to check</p>
+    <p><a href="javascript:history.go(-1);">Back to Previous</a></p>
+
+     <div id="result">
+<div id="close" onclick="CloseDiv();" />Close</div>
+     <div id="prettydiff" class="white"></div></div>
+</body>
+</html>
